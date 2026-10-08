@@ -71,3 +71,7 @@ Email_Spam_Classifier/
 ├── requirements.txt
 ├── Procfile
 └── README.md
+
+## 🚀 Live Demo
+
+[Click here to try the Email Spam Classifier](https://email-spam-classifier-c0tn.onrender.com)
