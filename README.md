@@ -1,63 +1,73 @@
-# Email Spam Classifier
+# 📧 Email Spam Classifier
 
 A Machine Learning based web application that classifies email or text messages as **SPAM** or **HAM (Not Spam)**.
 
-## Project Overview
+## 🚀 Live Demo
 
-Email Spam Classifier uses Machine Learning and Natural Language Processing (NLP) techniques to identify unwanted or spam messages.
+👉 [Click here to try the Email Spam Classifier](https://email-spam-classifier-c0tn.onrender.com)
 
-The system converts the input message into numerical features using **TF-IDF Vectorization** and uses a trained Machine Learning model to classify the message.
+## 📌 Project Overview
 
-## Features
+Email Spam Classifier uses **Machine Learning** and **Natural Language Processing (NLP)** techniques to identify unwanted or spam messages.
 
-- Classifies messages as SPAM or HAM
-- Machine Learning based prediction
-- TF-IDF text vectorization
-- Flask web application
-- Simple and user-friendly interface
-- Model accuracy of approximately 97.49%
+The system converts the input message into numerical features using **TF-IDF Vectorization** and uses a trained Machine Learning model to classify the message as **SPAM** or **HAM**.
 
-## Technologies Used
+## ✨ Features
 
-- Python
-- Pandas
-- Scikit-learn
-- TF-IDF
-- Flask
-- Joblib
-- HTML
-- CSS
-- JavaScript
+* 📩 Classifies messages as **SPAM** or **HAM**
+* 🤖 Machine Learning based prediction
+* 🔤 TF-IDF text vectorization
+* 🌐 Flask web application
+* 💻 Simple and user-friendly interface
+* 📊 Model accuracy of approximately **97.49%**
+* 🚀 Deployed using **Render**
 
-## Dataset
+## 🛠️ Technologies Used
 
-The project uses the **SMS Spam Collection dataset**.
+* **Python**
+* **Pandas**
+* **Scikit-learn**
+* **TF-IDF**
+* **Flask**
+* **Joblib**
+* **HTML**
+* **CSS**
+* **JavaScript**
+* **Render**
 
-Dataset contains:
+## 📂 Dataset
 
-- Total messages: 5572
-- Ham messages: 4825
-- Spam messages: 747
+The project uses the **SMS Spam Collection Dataset**.
 
-## Machine Learning Model
+### Dataset Details
+
+* **Total Messages:** 5572
+* **Ham Messages:** 4825
+* **Spam Messages:** 747
+
+## 🧠 Machine Learning Model
 
 The text messages are converted into numerical features using **TF-IDF Vectorization**.
 
-The trained model is then used to classify new messages into:
+The trained Machine Learning model then analyzes these features and classifies new messages into:
 
-- **HAM** – Normal message
-- **SPAM** – Unwanted or suspicious message
+* **HAM** – Normal or legitimate message
+* **SPAM** – Unwanted or suspicious message
 
-## Model Performance
+## 📊 Model Performance
 
 The trained model achieved approximately:
 
 **Accuracy: 97.49%**
 
-## Project Structure
+This shows that the model can effectively distinguish between spam and legitimate messages.
+
+## 📁 Project Structure
 
 ```text
 Email_Spam_Classifier/
+│
+├── dataset/
 │
 ├── templates/
 │   └── index.html
@@ -71,7 +81,38 @@ Email_Spam_Classifier/
 ├── requirements.txt
 ├── Procfile
 └── README.md
+```
 
-## 🚀 Live Demo
+## ⚙️ How to Run the Project Locally
 
-[Click here to try the Email Spam Classifier](https://email-spam-classifier-c0tn.onrender.com)
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/thaniksha15/Email_Spam_Classifier.git
+```
+
+### 2. Navigate to the Project Folder
+
+```bash
+cd Email_Spam_Classifier
+```
+
+### 3. Install Required Libraries
+
+```bash
+python -m pip install -r requirements.txt
+```
+
+### 4. Run the Flask Application
+
+```bash
+python app.py
+```
+
+### 5. Open in Browser
+
+```text
+http://127.0.0.1:5000
+```
+
+## 🧪
