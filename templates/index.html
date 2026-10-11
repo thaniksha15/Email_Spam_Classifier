@@ -1,100 +1,573 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Email Spam Classifier</title>
+
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
+            margin: 0;
+            padding: 30px 16px;
             font-family: Arial, sans-serif;
-            background: #f2f2f2;
-            text-align: center;
-            padding-top: 80px;
+            background: linear-gradient(135deg, #e0e7ff, #f5f3ff);
+            color: #1e293b;
         }
 
         .container {
-            width: 500px;
+            max-width: 950px;
             margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px gray;
         }
 
-        h1 {
-            margin-bottom: 25px;
+        .header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            color: #4338ca;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #64748b;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 22px;
+            border-radius: 16px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 22px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px 10px;
+            text-align: center;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 10px;
+            font-size: 15px;
+            color: #64748b;
+        }
+
+        .stat-card p {
+            margin: 0;
+            font-size: 27px;
+            font-weight: bold;
+        }
+
+        .total {
+            color: #4338ca;
+        }
+
+        .spam-count {
+            color: #dc2626;
+        }
+
+        .ham-count {
+            color: #16a34a;
         }
 
         textarea {
-            width: 90%;
-            height: 120px;
-            padding: 10px;
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
             font-size: 16px;
-            resize: none;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px #e0e7ff;
+        }
+
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
         }
 
         button {
-            margin-top: 20px;
-            padding: 12px 30px;
-            font-size: 16px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 9px;
+            font-size: 15px;
+            font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.88;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .primary {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .secondary {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: #b91c1c;
         }
 
         #result {
-            margin-top: 25px;
-            font-size: 22px;
+            display: none;
+            margin-top: 22px;
+            padding: 20px;
+            border-radius: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        #result.spam {
+            display: block;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+        }
+
+        #result.ham {
+            display: block;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        #result.error {
+            display: block;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+        }
+
+        .result-title {
+            font-size: 23px;
             font-weight: bold;
+            margin-bottom: 12px;
+        }
+
+        .confidence-track {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        #confidenceBar {
+            height: 100%;
+            width: 0;
+            background: #4f46e5;
+            transition: width 0.4s;
+        }
+
+        .keywords {
+            margin-top: 12px;
+        }
+
+        .keyword {
+            display: inline-block;
+            background: #ffedd5;
+            color: #9a3412;
+            padding: 5px 9px;
+            border-radius: 20px;
+            margin: 4px;
+            font-size: 13px;
+        }
+
+        .history-item {
+            border: 1px solid #e2e8f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .history-item strong {
+            display: inline-block;
+            margin-bottom: 7px;
+        }
+
+        .badge-spam {
+            color: #dc2626;
+        }
+
+        .badge-ham {
+            color: #16a34a;
+        }
+
+        .history-message {
+            white-space: pre-wrap;
+            margin: 8px 0;
+        }
+
+        .muted {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .section-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-heading h2 {
+            margin: 0;
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            padding: 15px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .buttons button {
+                flex: 1;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
         }
     </style>
 </head>
 
 <body>
-
 <div class="container">
 
-    <h1>📧 Email Spam Classifier</h1>
+    <header class="header">
+        <h1>📧 Email Spam Classifier</h1>
+        <p>Machine Learning Powered Message Detection</p>
+    </header>
 
-    <textarea id="message" placeholder="Enter your email message here..."></textarea>
+    <section class="stats">
+        <div class="stat-card">
+            <h3>Total Predictions</h3>
+            <p class="total" id="totalCount">0</p>
+        </div>
 
-    <br>
+        <div class="stat-card">
+            <h3>Spam Messages</h3>
+            <p class="spam-count" id="spamCount">0</p>
+        </div>
 
-    <button onclick="predictSpam()">Check Message</button>
+        <div class="stat-card">
+            <h3>Legitimate Messages</h3>
+            <p class="ham-count" id="hamCount">0</p>
+        </div>
+    </section>
 
-    <div id="result"></div>
+    <section class="card">
+        <h2>🔍 Check Your Message</h2>
+        <p>Enter an email or SMS message to classify it.</p>
+
+        <textarea
+            id="message"
+            maxlength="10000"
+            placeholder="Example: Congratulations! You won a free prize!"
+        ></textarea>
+
+        <div class="buttons">
+            <button class="primary" id="checkButton"
+                    onclick="predictSpam()">
+                Check Message
+            </button>
+
+            <button class="secondary" onclick="loadExample()">
+                Try Example
+            </button>
+
+            <button class="secondary" onclick="resetInput()">
+                Clear Input
+            </button>
+        </div>
+
+        <div id="result" role="status" aria-live="polite">
+            <div class="result-title" id="predictionTitle"></div>
+            <p id="predictionMessage"></p>
+
+            <div id="confidenceSection" style="display:none">
+                <strong>Model Confidence: <span id="confidenceText"></span></strong>
+                <div class="confidence-track">
+                    <div id="confidenceBar"></div>
+                </div>
+                <small class="muted">
+                    Confidence is the model's estimated probability,
+                    not a guarantee of correctness.
+                </small>
+            </div>
+
+            <div class="keywords" id="keywordSection"></div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="section-heading">
+            <h2>📋 Prediction History</h2>
+            <button class="danger" onclick="clearHistory()">
+                Clear History
+            </button>
+        </div>
+
+        <div id="historyList">
+            <p class="muted">No predictions yet.</p>
+        </div>
+    </section>
+
+    <footer class="footer">
+        Email Spam Classifier | Machine Learning Mini Project
+    </footer>
 
 </div>
 
 <script>
-    function predictSpam() {
+    const messageInput = document.getElementById("message");
+    const resultBox = document.getElementById("result");
+    const checkButton = document.getElementById("checkButton");
 
-        const message = document.getElementById("message").value;
+    function showError(message) {
+        resultBox.className = "error";
+        resultBox.style.display = "block";
+        document.getElementById("predictionTitle").textContent =
+            "⚠️ Error";
+        document.getElementById("predictionMessage").textContent = message;
+        document.getElementById("confidenceSection").style.display = "none";
+        document.getElementById("keywordSection").replaceChildren();
+    }
 
-        if (message.trim() === "") {
-            document.getElementById("result").innerHTML =
-                "Please enter a message.";
+    async function predictSpam() {
+        const message = messageInput.value.trim();
+
+        if (!message) {
+            showError("Please enter a message.");
             return;
         }
 
-        fetch("/predict", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                message: message
-            })
-        })
+        checkButton.disabled = true;
+        checkButton.textContent = "Checking...";
 
-        .then(response => response.json())
+        try {
+            const response = await fetch("/predict", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ message })
+            });
 
-        .then(data => {
-            document.getElementById("result").innerHTML =
-                "Prediction: " + data.prediction;
-        })
+            const data = await response.json();
 
-        .catch(error => {
-            document.getElementById("result").innerHTML =
-                "Error occurred!";
+            if (!response.ok) {
+                throw new Error(data.error || "Prediction failed.");
+            }
+
+            const isSpam = data.prediction === "SPAM";
+
+            resultBox.className = isSpam ? "spam" : "ham";
+            resultBox.style.display = "block";
+
+            document.getElementById("predictionTitle").textContent =
+                isSpam ? "🚨 SPAM MESSAGE" : "✅ LEGITIMATE MESSAGE (HAM)";
+
+            document.getElementById("predictionMessage").textContent =
+                isSpam
+                    ? "The model classified this message as spam."
+                    : "The model classified this message as legitimate.";
+
+            const confidenceSection =
+                document.getElementById("confidenceSection");
+
+            if (typeof data.confidence === "number") {
+                confidenceSection.style.display = "block";
+                document.getElementById("confidenceText").textContent =
+                    data.confidence + "%";
+                document.getElementById("confidenceBar").style.width =
+                    Math.max(0, Math.min(100, data.confidence)) + "%";
+            } else {
+                confidenceSection.style.display = "none";
+            }
+
+            const keywordSection =
+                document.getElementById("keywordSection");
+            keywordSection.replaceChildren();
+
+            if (Array.isArray(data.keywords) && data.keywords.length > 0) {
+                const heading = document.createElement("strong");
+                heading.textContent = "Matched suspicious keywords: ";
+                keywordSection.appendChild(heading);
+
+                data.keywords.forEach(word => {
+                    const tag = document.createElement("span");
+                    tag.className = "keyword";
+                    tag.textContent = word;
+                    keywordSection.appendChild(tag);
+                });
+            } else {
+                keywordSection.textContent =
+                    "No configured suspicious keywords matched.";
+            }
+
+            await Promise.all([loadHistory(), loadStats()]);
+
+        } catch (error) {
+            showError(error.message || "Unable to connect to the server.");
+        } finally {
+            checkButton.disabled = false;
+            checkButton.textContent = "Check Message";
+        }
+    }
+
+    async function loadHistory() {
+        const response = await fetch("/history");
+
+        if (!response.ok) {
+            throw new Error("Unable to load history.");
+        }
+
+        const history = await response.json();
+        const historyList = document.getElementById("historyList");
+        historyList.replaceChildren();
+
+        if (!history.length) {
+            const empty = document.createElement("p");
+            empty.className = "muted";
+            empty.textContent = "No predictions yet.";
+            historyList.appendChild(empty);
+            return;
+        }
+
+        history.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "history-item";
+
+            const title = document.createElement("strong");
+            title.className = item.prediction === "SPAM"
+                ? "badge-spam" : "badge-ham";
+            title.textContent = item.prediction === "SPAM"
+                ? "🚨 SPAM" : "✅ HAM";
+
+            const time = document.createElement("div");
+            time.className = "muted";
+            time.textContent = item.time || "";
+
+            const text = document.createElement("div");
+            text.className = "history-message";
+            text.textContent = item.message;
+
+            card.append(title, time, text);
+
+            if (typeof item.confidence === "number") {
+                const confidence = document.createElement("div");
+                confidence.className = "muted";
+                confidence.textContent =
+                    "Model confidence: " + item.confidence + "%";
+                card.appendChild(confidence);
+            }
+
+            historyList.appendChild(card);
         });
     }
+
+    async function loadStats() {
+        const response = await fetch("/stats");
+
+        if (!response.ok) {
+            throw new Error("Unable to load statistics.");
+        }
+
+        const data = await response.json();
+
+        document.getElementById("totalCount").textContent = data.total;
+        document.getElementById("spamCount").textContent = data.spam;
+        document.getElementById("hamCount").textContent = data.ham;
+    }
+
+    async function clearHistory() {
+        if (!confirm("Are you sure you want to clear history and statistics?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch("/clear-history", {
+                method: "POST"
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || "Unable to clear history.");
+            }
+
+            await Promise.all([loadHistory(), loadStats()]);
+
+        } catch (error) {
+            alert(error.message || "Unable to clear history.");
+        }
+    }
+
+    function resetInput() {
+        messageInput.value = "";
+        resultBox.style.display = "none";
+        messageInput.focus();
+    }
+
+    function loadExample() {
+        messageInput.value =
+            "Congratulations! You won a free prize. Click now to claim your reward!";
+        messageInput.focus();
+    }
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        try {
+            await Promise.all([loadHistory(), loadStats()]);
+        } catch (error) {
+            console.error("Initial data loading failed:", error);
+        }
+    });
 </script>
 
 </body>
